@@ -1717,9 +1717,6 @@ try:
     # 3초동안 암묵적 대기
     driver.implicitly_wait(time_to_wait=3)
     
-    # 3초동안 암묵적 대기
-    driver.implicitly_wait(time_to_wait=3)
-    
     # 로컬 녹화 파일 모달창 > 전체 다운로드 라디오 체크 메뉴 확인
     try:
         local_recording_all_check = driver.find_element(By.XPATH, 
@@ -1854,11 +1851,11 @@ try:
     driver.implicitly_wait(time_to_wait=3)
     
     # 로컬 녹화 파일 모달창 > 1분 녹화 파일들 각각 선택 > 선택 삭제
-    local_recording_delete = [
+    menubox_option = [
         {
             "xpath" : "//main[@class='main-wrapper']/div[@class='main-body stream']/div[@class='stream-menu menus']/div[@class='menus-box']/div[4][@class='tooltip tooltip-menu']/button[@class='menu']",
             "timeout" : 5,
-            "message" : "로컬 녹화 목록 메뉴를 선택했습니다."
+            "message" : "로컬 녹화 목록 메뉴를 클릭했습니다."
             },
         {
             "xpath" : "//div[@class='vue-scrollbar__wrapper']/div[@class='vue-scrollbar__area vue-scrollbar-transition']/div[@class='scroll--inner']/div[1][@class='table__row']/div[@class='table__cell--toggle']/button[@class='toggle-button']",
@@ -1886,30 +1883,193 @@ try:
             "message" : "로컬 녹화 파일 모달창을 닫았습니다."
             }
         ]
-    # 로컬 녹화 파일 클릭
-    recording_delete = local_recording_delete[0]
-    recording_list_btn = WebDriverWait(driver, recording_delete["timeout"]).until(
-        EC.presence_of_element_located((By.XPATH, recording_delete["xpath"])))
-    actions = ActionChains(driver)\
-        .move_to_element(recording_list_btn)\
-        .click(recording_list_btn)\
-        .perform()
-    print(recording_delete["message"])
-    
-    # 3초동안 타임 슬립 : 위에 로컬 녹화 목록 버튼 클릭 실행 후, for문 실행되려면 명시적 대기해야 함
-    time.sleep(3)
-    
-    # 파일 선택 및 삭제 동작
-    for recording_delete_xpath in local_recording_delete[1:]:
-        recording_list_delete = WebDriverWait(driver, recording_delete_xpath["timeout"]).until(
-            EC.presence_of_element_located((By.XPATH, recording_delete_xpath["xpath"])))
+    for menubox_xpath in menubox_option:
+        menubox_setting = WebDriverWait(driver, menubox_xpath["timeout"]).until(
+            EC.presence_of_element_located((By.XPATH, menubox_xpath["xpath"])))
         actions = ActionChains(driver)\
-            .move_to_element(recording_list_delete)\
-            .click(recording_list_delete)\
+            .move_to_element(menubox_setting)\
+            .click(menubox_setting)\
             .perform()
-        print(recording_delete_xpath["message"])
+        print(menubox_xpath["message"])
         time.sleep(3)
-    
+
+
+    # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # 설정 메뉴 클릭
+    menubox_setting = WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.XPATH, "//main[@class='main-wrapper']/div[@class='main-body stream']/div[@class='stream-menu menus']/div[@class='menus-box']/div[5][@class='tooltip tooltip-menu']/button[@class='menu']")))
+    actions = ActionChains(driver)\
+        .move_to_element(menubox_setting)\
+        .click(menubox_setting)\
+        .perform()
+    print("설정 메뉴를 클릭했습니다.")
+
+    # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # # 설정 메뉴 클릭 > 환경 설정 모달창 출력
+    try:
+        preferences = driver.find_element(By.XPATH, "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--header']/p[@class='modal--title' and contains(text(), '환경 설정')]")
+        if preferences.is_displayed():
+            print("환경설정 모달창이 존재합니다.")
+        else:
+            print("환경설정 모달창이 존재하지 않습니다.")
+    except NoSuchElementException:
+        print("환경설정 모달창을 찾을 수 없습니다.")
+
+    # # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # # 환경 설정 > 포인팅 설정 메뉴 출력
+    try:
+        pointing_set_menu = driver.find_element(By.XPATH, 
+            "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting-nav']/button[@data-text='포인팅 설정' and @class='service-setting-nav__menu active']")
+        if pointing_set_menu.is_displayed():
+            print("포인팅 설정 메뉴가 존재합니다.")
+        else:
+            print("포인팅 설정 메뉴가 존재하지 않습니다.")
+    except NoSuchElementException:
+        print("포인팅 설정 메뉴를 찾을 수 없습니다.")
+
+    # # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # # 환경 설정 > 포인팅 설정 메뉴 > 참가자 포인팅 메뉴 출력
+    try:
+        participant_pointing = driver.find_element(By.XPATH, 
+            "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting__view']/div[@class='service-setting__row']/p[@class='service-setting__text' and contains(text(), '참가자 포인팅')]")
+        if participant_pointing.is_displayed():
+            print("참가자 포인팅 메뉴가 존재합니다.")
+        else:
+            print("참가자 포인팅 메뉴가 존재하지 않습니다.")
+    except NoSuchElementException:
+        print("참가자 포인팅 메뉴를 찾을 수 없습니다.")
+
+    # # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # # 환경 설정 > 포인팅 설정 메뉴 > 포인팅 허용 메뉴 확인
+    try:
+        allow_pointing = driver.find_element(By.XPATH, 
+            "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting__view']/div[@class='service-setting__row']/div[@class='checkbox toggle']/span[@class='checkbox-text' and contains(text(), '참가자 포인팅 허용')]")
+        if allow_pointing.is_displayed():
+            print("참가자 포인팅 허용 메뉴가 존재합니다.")
+        else:
+            print("참가자 포인팅 허용 메뉴가 존재하지 않습니다.")
+    except NoSuchElementException:
+        print("참가자 포인팅 허용 메뉴를 찾을 수 없습니다.")
+
+    # # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # 환경 설정 메뉴 > 포인팅 메뉴
+    allow_pointing_option = [
+        {
+            "xpath" : "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting__view']/div[@class='service-setting__row']/div[@class='checkbox toggle']/span[@class='checkbox-toggle toggle' and contains(text(), 'ON')]",
+            "timeout" : 5,
+            "message": "참가자 포인팅 허용 체크를 해제했습니다.",
+            "pointing_check" : True
+            },
+        {
+            "xpath" : "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting__view']/div[@class='service-setting__row']/div[@class='checkbox']/span[@class='checkbox-toggle' and contains(text(), 'OFF')]",
+            "timeout" : 5,
+            "message": "참가자 포인팅 허용을 다시 체크했습니다.",
+            "pointing_check" : False
+            }
+        ]
+    # 환경 설정 > 포인팅 설정 메뉴 > 포인팅 허용 체크 해제 > 다시 포인팅 허용 체크
+    allow_pointing_count = range(1, 2)
+    for i in allow_pointing_count:
+        for allow_pointing_xpath in allow_pointing_option:
+            allow_pointing_check = WebDriverWait(driver, allow_pointing_xpath["timeout"]).until(
+                EC.presence_of_element_located((By.XPATH, allow_pointing_xpath["xpath"])))
+            actions = ActionChains(driver)\
+                .move_to_element(allow_pointing_check)\
+                .click(allow_pointing_check)\
+                .perform()
+            print(allow_pointing_xpath["message"])
+            
+            # pointing ON 일 때
+            if allow_pointing_xpath["pointing_check"]:
+                time.sleep(3)
+            # pointing OFF 일 때
+            elif not allow_pointing_xpath["pointing_check"]:
+                pass
+
+    # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+    # 환경 설정 > 로컬 녹화 설정 메뉴 출력
+    try:
+        local_recording_menu = driver.find_element(By.XPATH, 
+            "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting-nav']/button[@data-text='로컬 녹화 설정' and @class='service-setting-nav__menu']")
+        if local_recording_menu.is_displayed():
+            print("로컬 녹화 설정 메뉴가 존재합니다.")
+            
+            # 로컬 녹화 설정 메뉴 클릭
+            local_recording_set = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.XPATH, 
+                    "//div[@class='modal service-setting-modal']/div[@class='modal--inner']/div[@class='modal--body']/div[@class='service-setting']/section[@class='service-setting-nav']/button[@data-text='로컬 녹화 설정' and @class='service-setting-nav__menu']")))
+            actions = ActionChains(driver)\
+                .move_to_element(local_recording_set)\
+                .click(local_recording_set)\
+                .perform()
+            print("로컬 녹화 설정 메뉴를 클릭했습니다.")
+        else:
+            print("로컬 녹화 설정 메뉴가 존재하지 않습니다.")
+    except NoSuchElementException:
+        print("로컬 녹화 설정 메뉴를 찾을 수 업습니다.")
+        
+    # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
+
+
+
+
+
+#######=============================================================
+    # 환경 설정 > 로컬 녹화 설정 메뉴
+    try:
+        # 녹화 대상 메뉴 출력
+        recording_target_menu = driver.find_element(By.XPATH, 
+            "//section[@class='service-setting__view']/div[1][@class='service-setting__row']/p[@class='service-setting__text' and contains(text(), '녹화대상')]")
+        if recording_target_menu.is_displayed():
+            print("녹화 대상 메뉴가 존재합니다.")
+        else:
+            print("녹화 대상 메뉴가 존재하지 않습니다.")
+            
+        # 최대 녹화 시간 메뉴 출력
+        maximum_recording_time = driver.find_element(By.XPATH, 
+            "//section[@class='service-setting__view']/div[2][@class='service-setting__row']/p[@class='service-setting__text' and contains(text(), '최대 녹화 시간')]")
+        if maximum_recording_time.is_displayed():
+            print("최대 녹화 시간 메뉴가 존재합니다.")
+        else:
+            print("최대 녹화 시간 메뉴가 존재하지 않습니다.")
+            
+        # 최대 녹화 간격 메뉴 출력
+        maximum_recording_interval = driver.find_element(By.XPATH, 
+            "//section[@class='service-setting__view']/div[3][@class='service-setting__row']/div[@class='service-setting__text custom']/p[contains(text(), '최대 녹화 간격')]")
+        if maximum_recording_interval.is_displayed():
+            print("최대 녹화 간격 메뉴가 존재합니다.")
+        else:
+            print("최대 녹화 간격 메뉴가 존재하지 않습니다.")
+        
+        # 녹화 영상 해상도
+        recording_video_resolution = driver.find_element(By.XPATH, 
+            "//section[@class='service-setting__view']/div[4][@class='service-setting__row']/div[@class='service-setting__text custom']/p[contains(text(), '녹화 영상 해상도')]")
+        if recording_video_resolution.is_displayed():
+            print("녹화 영상 해상도")
+        
+        # 참가자 로컬 녹화
+        "//section[@class='service-setting__view']/div[5][@class='service-setting__row']/p[@class='service-setting__text' and contains(text(), '참가자 로컬 녹화')]"
+        
+    except NoSuchElementException:
+        print("녹화 대상 메뉴를 찾을 수 없습니다.")
+        
+    # 3초동안 암묵적 대기
+    driver.implicitly_wait(time_to_wait=3)
     
 finally:
     # 브라우저 세션 종료
